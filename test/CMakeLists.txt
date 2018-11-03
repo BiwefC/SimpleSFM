@@ -12,11 +12,14 @@ FIND_PACKAGE( OpenCV REQUIRED )
 
 # set(PCL_INCLUDE_DIRS /usr/include/pcl-1.8)
 # 添加头文件和库文件
+file(GLOB_RECURSE SRC ../src/*.cpp)
+
 ADD_DEFINITIONS( ${PCL_DEFINITIONS} )
 INCLUDE_DIRECTORIES( ${PCL_INCLUDE_DIRS} )
 INCLUDE_DIRECTORIES(../include )
+
 LINK_LIBRARIES( ${PCL_LIBRARY_DIRS} )
 
-ADD_EXECUTABLE( test_img2pc test_img2pc.cpp ../src/SLAMBase.cpp)
+ADD_EXECUTABLE(test_img2pc test_img2pc.cpp ${SRC})
 TARGET_LINK_LIBRARIES( test_img2pc ${OpenCV_LIBS}
     ${PCL_LIBRARIES} )

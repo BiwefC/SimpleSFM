@@ -10,6 +10,8 @@ int main(int argc, char** argv)
     rgb = cv::imread("../data/rgb.png");
     depth = cv::imread("../data/depth.png", -1);
 
+    pcl::visualization::CloudViewer viewer("viewer");
+
     CAMERA_INTRINSIC_PARAMETERS camera;
     camera.scale = 1000;
     camera.cx = 325.5;
@@ -19,6 +21,9 @@ int main(int argc, char** argv)
 
     PointCloud::Ptr cloud = image2PointCloud(rgb, depth, camera);
     pcl::io::savePCDFile( "../data/pointcloud.pcd", *cloud );
+    viewer.showCloud( cloud );
+
+    while(1);
     // 清除数据并退出
     cloud->points.clear();
     cout<<"Point cloud saved."<<endl;

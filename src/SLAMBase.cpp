@@ -1,6 +1,6 @@
 # include "SLAMBase.hpp"
 
-PointCloud::Ptr Image2PointCloud( cv::Mat& rgb, cv::Mat& depth, CAMERA_INTRINSIC_PARAMETERS& camera )
+PointCloud::Ptr Image2PointCloud( cv::Mat& rgb, cv::Mat& depth, Camera_Intrinsic_Parameters& camera )
 {
     PointCloud::Ptr cloud ( new PointCloud );
 
@@ -37,7 +37,7 @@ PointCloud::Ptr Image2PointCloud( cv::Mat& rgb, cv::Mat& depth, CAMERA_INTRINSIC
     return cloud;
 }
 
-cv::Point3f Point2dTo3d( cv::Point3f& point, CAMERA_INTRINSIC_PARAMETERS& camera )
+cv::Point3f Point2dTo3d( cv::Point3f& point, Camera_Intrinsic_Parameters& camera )
 {
     cv::Point3f p; // 3D 点
     p.z = double( point.z ) / camera.scale;
@@ -46,7 +46,7 @@ cv::Point3f Point2dTo3d( cv::Point3f& point, CAMERA_INTRINSIC_PARAMETERS& camera
     return p;
 }
 
-void FRAME::ComputeFeatAndDesp(void)
+void Frame::ComputeFeatAndDesp(void)
 {
     cv::Ptr<cv::FeatureDetector> feat_dectec = cv::ORB::create();
     cv::Ptr<cv::DescriptorExtractor> feat_desp = cv::ORB::create();
@@ -57,7 +57,7 @@ void FRAME::ComputeFeatAndDesp(void)
     return;
 }
 
-RESULT_OF_PNP MatchAndRansac(FRAME& frame1, FRAME& frame2, CAMERA_INTRINSIC_PARAMETERS& camera)
+Result_of_PnP MatchAndRansac(Frame& frame1, Frame& frame2, Camera_Intrinsic_Parameters& camera)
 {
 	//read data from data floder
 	cv::Mat pic1_rgb = frame1.rgb;
@@ -158,7 +158,7 @@ RESULT_OF_PNP MatchAndRansac(FRAME& frame1, FRAME& frame2, CAMERA_INTRINSIC_PARA
     cv::imwrite( "./data/inlPoint.png", imgMatch);
     cv::waitKey(0);
 
-    RESULT_OF_PNP result;
+    Result_of_PnP result;
 	result.rvec = rvec;
 	result.tvec = tvec;
 	result.inlPoint = inlPoint.rows;

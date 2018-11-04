@@ -12,7 +12,7 @@ int main(int argc, char** argv)
 
     pcl::visualization::CloudViewer viewer("viewer");
 
-    CAMERA_INTRINSIC_PARAMETERS camera;
+    Camera_Intrinsic_Parameters camera;
     camera.scale = 1000;
     camera.cx = 325.5;
     camera.cy = 253.5;

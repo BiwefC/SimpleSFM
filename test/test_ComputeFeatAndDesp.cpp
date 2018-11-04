@@ -5,7 +5,7 @@
 int main(int argc, char** argv)
 {
     // while(1);
-    FRAME frame;
+    Frame frame;
 
     frame.rgb = cv::imread("../data/rgb1.png");
     frame.depth = cv::imread("../data/depth1.png", -1);

@@ -20,8 +20,8 @@ INCLUDE_DIRECTORIES(../include )
 
 LINK_LIBRARIES( ${PCL_LIBRARY_DIRS} )
 
-ADD_EXECUTABLE(test_img2pc test_img2pc.cpp ${SRC})
-TARGET_LINK_LIBRARIES( test_img2pc ${OpenCV_LIBS}
+ADD_EXECUTABLE(test_Img2PC test_Img2PC.cpp ${SRC})
+TARGET_LINK_LIBRARIES( test_Img2PC ${OpenCV_LIBS}
     ${PCL_LIBRARIES} )
 
 ADD_EXECUTABLE(test_ComputeFeatAndDesp test_ComputeFeatAndDesp.cpp ${SRC})

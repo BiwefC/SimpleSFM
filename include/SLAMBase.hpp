@@ -30,18 +30,18 @@ using namespace std;
 typedef pcl::PointXYZRGBA PointT;
 typedef pcl::PointCloud<PointT> PointCloud;
 
-struct CAMERA_INTRINSIC_PARAMETERS
+struct Camera_Intrinsic_Parameters
 {
     double cx, cy, fx, fy, scale;
 };
 
-struct RESULT_OF_PNP
+struct Result_of_PnP
 {
     cv::Mat rvec, tvec;
     int inlPoint;
 };
 
-class FRAME
+class Frame
 {
 public:
     int frameID;
@@ -53,8 +53,8 @@ public:
 };
 
 
-PointCloud::Ptr Image2PointCloud(cv::Mat& rgb, cv::Mat& depth, CAMERA_INTRINSIC_PARAMETERS& camera);
-cv::Point3f Point2dTo3d(cv::Point3f& point, CAMERA_INTRINSIC_PARAMETERS& camera);
-RESULT_OF_PNP MatchAndRansac(FRAME& frame1, FRAME& frame2, CAMERA_INTRINSIC_PARAMETERS& camera);
+PointCloud::Ptr Image2PointCloud(cv::Mat& rgb, cv::Mat& depth, Camera_Intrinsic_Parameters& camera);
+cv::Point3f Point2dTo3d(cv::Point3f& point, Camera_Intrinsic_Parameters& camera);
+Result_of_PnP MatchAndRansac(Frame& frame1, Frame& frame2, Camera_Intrinsic_Parameters& camera);
 
 #endif

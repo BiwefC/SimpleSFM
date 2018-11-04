@@ -4,12 +4,7 @@
 
 int main(int argc, char** argv)
 {
-    // while(1);
-    Frame frame;
-
-    frame.rgb = cv::imread("../data/rgb1.png");
-    frame.depth = cv::imread("../data/depth1.png", -1);
-
+    Frame frame(1, "../data");
 
     frame.ComputeFeatAndDesp();
     cv::Mat imgOutput;

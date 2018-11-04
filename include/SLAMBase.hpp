@@ -3,6 +3,7 @@
 
 // 各种头文件
 // C++标准库
+#include <string>
 #include <fstream>
 #include <vector>
 #include <map>
@@ -44,6 +45,8 @@ struct Result_of_PnP
 class Frame
 {
 public:
+    Frame(void);
+    Frame(int index, string data_dir);
     int frameID;
     cv::Mat rgb, depth;
     cv::Mat desp;

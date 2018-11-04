@@ -46,6 +46,27 @@ cv::Point3f Point2dTo3d( cv::Point3f& point, Camera_Intrinsic_Parameters& camera
     return p;
 }
 
+Frame::Frame(void)
+{
+    ;
+}
+
+Frame::Frame(int index, string data_dir)
+{
+    string rgb_path;
+    string depth_path;
+    stringstream ss_rgb, ss_depth;
+
+    ss_rgb << data_dir << "/rgb/" << index << ".png";
+    ss_rgb >> rgb_path;
+
+    ss_depth << data_dir << "/depth/" << index << ".png";
+    ss_depth >> depth_path;
+
+    rgb = cv::imread(rgb_path);
+    depth = cv::imread(depth_path, -1);
+}
+
 void Frame::ComputeFeatAndDesp(void)
 {
     cv::Ptr<cv::FeatureDetector> feat_dectec = cv::ORB::create();

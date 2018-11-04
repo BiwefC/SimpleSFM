@@ -1,2 +1,9 @@
 /build/*
 /bin/*
+/data/*
+!/data/depth/1.png
+!/data/depth/2.png
+!/data/depth/3.png
+!/data/rgb/1.png
+!/data/rgb/2.png
+!/data/rgb/3.png

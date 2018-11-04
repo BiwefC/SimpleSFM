@@ -31,3 +31,7 @@ TARGET_LINK_LIBRARIES( test_ComputeFeatAndDesp ${OpenCV_LIBS}
 ADD_EXECUTABLE(test_MatchAndRansac test_MatchAndRansac.cpp ${SRC})
 TARGET_LINK_LIBRARIES( test_MatchAndRansac ${OpenCV_LIBS}
     ${PCL_LIBRARIES} )
+
+ADD_EXECUTABLE(test_RvecTvec2Mat test_RvecTvec2Mat.cpp ${SRC})
+TARGET_LINK_LIBRARIES( test_RvecTvec2Mat ${OpenCV_LIBS}
+    ${PCL_LIBRARIES} )

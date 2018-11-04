@@ -184,3 +184,22 @@ Eigen::Isometry3d RvecTvec2Mat(cv::Mat& rvec, cv::Mat& tvec)
     T(2,3) = tvec.at<double>(2,0);
     return T;
 }
+
+
+PointCloud::Ptr UpdatePointCloud(PointCloud::Ptr last_pc, Frame& new_frame, Eigen::Isometry3d T, Camera_Intrinsic_Parameters& camera)
+{
+
+	PointCloud::Ptr newCloud = Image2PointCloud(new_frame.rgb, new_frame.depth, camera);
+	PointCloud::Ptr output (new PointCloud());
+	pcl::transformPointCloud( *last_pc, *output, T.matrix() );
+	*newCloud += *output;
+	std::cout<<"Done!!!"<<std::endl;
+
+	static pcl::VoxelGrid<PointT> voxel;
+	double gridsize = 0.01;
+	voxel.setLeafSize( gridsize, gridsize, gridsize );
+	voxel.setInputCloud(newCloud);
+	PointCloud::Ptr tmp(new PointCloud());
+	return newCloud;
+
+}

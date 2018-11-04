@@ -57,5 +57,6 @@ PointCloud::Ptr Image2PointCloud(cv::Mat& rgb, cv::Mat& depth, Camera_Intrinsic_
 cv::Point3f Point2dTo3d(cv::Point3f& point, Camera_Intrinsic_Parameters& camera);
 Result_of_PnP MatchAndRansac(Frame& frame1, Frame& frame2, Camera_Intrinsic_Parameters& camera);
 Eigen::Isometry3d RvecTvec2Mat(cv::Mat& rvec, cv::Mat& tvec);
+PointCloud::Ptr UpdatePointCloud(PointCloud::Ptr last_pc, Frame& new_frame, Eigen::Isometry3d T, Camera_Intrinsic_Parameters& camera);
 
 #endif

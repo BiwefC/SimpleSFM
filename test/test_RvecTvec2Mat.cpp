@@ -2,7 +2,6 @@
 
 int main(int argc, char** argv)
 {
-    Frame frame1,frame2;
     Result_of_PnP result;
     Eigen::Isometry3d T;
 

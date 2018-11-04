@@ -2,14 +2,10 @@
 
 int main(int argc, char** argv)
 {
-	Frame frame1,frame2;
 	Result_of_PnP result;
 	Eigen::Isometry3d T;
-
-	frame1.rgb = cv::imread("../data/rgb1.png");
-	frame1.depth = cv::imread("../data/depth1.png", -1);
-	frame2.rgb = cv::imread("../data/rgb2.png");
-	frame2.depth = cv::imread("../data/depth2.png");
+    Frame frame1(1, "../data");
+    Frame frame2(2, "../data");
 
 	Camera_Intrinsic_Parameters camera;
 	camera.scale = 1000;

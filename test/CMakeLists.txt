@@ -23,3 +23,11 @@ LINK_LIBRARIES( ${PCL_LIBRARY_DIRS} )
 ADD_EXECUTABLE(test_img2pc test_img2pc.cpp ${SRC})
 TARGET_LINK_LIBRARIES( test_img2pc ${OpenCV_LIBS}
     ${PCL_LIBRARIES} )
+
+ADD_EXECUTABLE(test_CompuFeaAndDesp test_CompuFeaAndDesp.cpp ${SRC})
+TARGET_LINK_LIBRARIES( test_CompuFeaAndDesp ${OpenCV_LIBS}
+    ${PCL_LIBRARIES} )
+
+ADD_EXECUTABLE(test_MatchAndRansac test_MatchAndRansac.cpp ${SRC})
+TARGET_LINK_LIBRARIES( test_MatchAndRansac ${OpenCV_LIBS}
+    ${PCL_LIBRARIES} )

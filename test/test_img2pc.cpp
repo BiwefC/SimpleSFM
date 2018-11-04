@@ -7,8 +7,8 @@ int main(int argc, char** argv)
     // while(1);
     cv::Mat rgb, depth;
 
-    rgb = cv::imread("../data/rgb.png");
-    depth = cv::imread("../data/depth.png", -1);
+    rgb = cv::imread("../data/rgb1.png");
+    depth = cv::imread("../data/depth1.png", -1);
 
     pcl::visualization::CloudViewer viewer("viewer");
 

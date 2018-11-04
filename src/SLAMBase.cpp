@@ -51,8 +51,8 @@ void CompuFeaAndDesp(FRAME& frame)
 	cv::Ptr<cv::FeatureDetector> fea_detec;
 	cv::Ptr<cv::DescriptorExtractor> fea_desp;
 
-	fea_detec = cv::FeatureDetector::create("ORB");
-	fea_desp  = cv::DescriptorExtractor::create("ORB");
+	fea_detec = cv::ORB::create();
+	fea_desp  = cv::ORB::create();
 
 	fea_detec->detect( frame.rgb, frame.fea );
 	fea_desp->compute( frame.rgb, frame.fea, frame.desp );
@@ -69,6 +69,9 @@ RESULT_OF_PNP MatchAndRansac(FRAME& frame1, FRAME& frame2, CAMERA_INTRINSIC_PARA
 	cv::Mat pic2_rgb = frame2.rgb;
 	cv::Mat pic1_depth = frame1.depth;
 	cv::Mat pic2_depth = frame2.depth;
+  cv::Mat pic1_desp = frame1.desp;
+  cv::Mat pic2_desp = frame2.desp;
+
 	vector< cv::KeyPoint > fea1 = frame1.fea;
 	vector< cv::KeyPoint > fea2 = frame2.fea;
 
@@ -76,42 +79,41 @@ RESULT_OF_PNP MatchAndRansac(FRAME& frame1, FRAME& frame2, CAMERA_INTRINSIC_PARA
 	std::cout<<"Key points of two images: "<<fea1.size()<<", "<<fea2.size()<<std::endl;
 
 	//match all feature points
-	vector< cv::DMatch > matches; 
+	vector< cv::DMatch > matches;
 	cv::BFMatcher matcher;
-	matcher.match(pic1_desp, pic2_desp2, matches);
+	matcher.match(pic1_desp, pic2_desp, matches);
 	std::cout<<"Find total "<<matches.size()<<" matches."<<std::endl;
 
 	//output match
 	cv::Mat imgMatch;
-	cv::drawMatches( pic1_rgb, fea1, fea2_rgb, fea2, matches, imgMatch);
+	cv::drawMatches( pic1_rgb, fea1, pic2_rgb, fea2, matches, imgMatch);
 	cv::imshow( "matches", imgMatch);
 	cv::imwrite( "./data/matches.png", imgMatch);
-	cv::waitKey(0);	
+	cv::waitKey(0);
 
 	//Selete feature point match
 	//rule:delete points that the distance longer than forth min distance
     // first step : find the min distance
-    vector< cv::DMatch > goodMatch;
-    double min_dis = 10000000;
-	size_t i, j;
+  vector< cv::DMatch > goodMatch;
+  double min_dis = 10000000;
 
-	for(i = 0; i < matches.size(); i++)    
+	for(size_t i = 0; i < matches.size(); i++)
 	{
-		if(matches[i] < min_dis) min_dis = matches[i];
+		if(matches[i].distance < min_dis) min_dis = matches[i].distance;
 	}
 
 	std::cout<<"min_dis = "<<min_dis<<std::endl;
 
 	//second:slecte the good feature points
-	for(j = 0; j < matches.size(); j++)
+	for(size_t i = 0; i < matches.size(); i++)
 	{
-		if (matches[i].distance < 10*min_dis) goodMatch.push_back(matches[i]); 
+		if (matches[i].distance < 10*min_dis) goodMatch.push_back(matches[i]);
 	}
 
 	//output goodMatch
-	std::cout<<"goodMatch ="<<goodMatch.size()<<std::endl;
+	std::cout<<"goodMatch = "<<goodMatch.size()<<std::endl;
 
-	cv::drawMatches( pic1_rgb, fea1, fea2_rgb, fea2, goodMatch, imgMatch);
+	cv::drawMatches( pic1_rgb, fea1, pic2_rgb, fea2, goodMatch, imgMatch);
 	cv::imshow( "good_matches", imgMatch);
 	cv::imwrite( "./data/good_matches.png", imgMatch);
 	cv::waitKey(0);
@@ -123,17 +125,17 @@ RESULT_OF_PNP MatchAndRansac(FRAME& frame1, FRAME& frame2, CAMERA_INTRINSIC_PARA
 	vector<cv::Point2f> pic_img;
 
 	//get the depth of pic1
-	for(i = 0; i < goodMatch.size(); i++)
+	for(size_t i = 0; i < goodMatch.size(); i++)
 	{
 		cv::Point2f p = fea1[goodMatch[i].queryIdx].pt;
 		ushort d = pic1_depth.ptr<ushort>(int(p.y))[int(p.x)];
 		if(d == 0) continue;
-		pic_img.push_back( cv::Point2f(fea2[goodMatches[i].trainIdx].pt));
+		pic_img.push_back( cv::Point2f(fea2[goodMatch[i].trainIdx].pt));
 
 		//(u,v,d) to (x,y,z)
 		cv::Point3f pt (p.x, p.y, d);
 		cv::Point3f pd = point2dTo3d(pt, Camera);
-		pic_pbj.push_back(pd);
+		pic_obj.push_back(pd);
 
 	}
 
@@ -143,25 +145,25 @@ RESULT_OF_PNP MatchAndRansac(FRAME& frame1, FRAME& frame2, CAMERA_INTRINSIC_PARA
 	cv::Mat cameraMatrix(3, 3, CV_64F, Camera_matrix);
 	cv::Mat rvec, tvec, inlPoint;
 
-	cv::solvePnPRansac(pic_obj, pic_img, cameraMatrix, cv::Mat(), rvec, tvec, false, 100, 1.0, 100, inlPoint);
+	cv::solvePnPRansac(pic_obj, pic_img, cameraMatrix, cv::Mat(), rvec, tvec, false, 100, 8, 0.99, inlPoint);
 
 	std::cout<<"inlPoint: "<<inlPoint.rows<<std::endl;
 	std::cout<<"R="<<rvec<<std::endl;
 	std::cout<<"t="<<tvec<<std::endl;
 
 	vector<cv::DMatch> matchShow;
-    for (i = 0; i < inlPoint.rows; i++)
+    for (size_t i = 0; i < inlPoint.rows; i++)
     {
-        matchShow.push_back(goodMatch[inlPoint.ptr<int>(i)[0]]);    
+        matchShow.push_back(goodMatch[inlPoint.ptr<int>(i)[0]]);
     }
-	
+
 	//out inlpoint
     cv::drawMatches( pic1_rgb, fea1, pic2_rgb, fea2, matchShow, imgMatch);
     cv::imshow( "inlPoint matches", imgMatch);
     cv::imwrite( "./data/inlPoint.png", imgMatch);
     cv::waitKey(0);
 
-    RESULT_OF_PNP result;
+  RESULT_OF_PNP result;
 	result.rvec = rvec;
 	result.tvec = tvec;
 	result.inlPoint = inlPoint.rows;

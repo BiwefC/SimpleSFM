@@ -1,3 +1,5 @@
+#include "SLAMBase.hpp"
+
 int main(int argc, char** argv)
 {
     // while(1);
@@ -15,10 +17,10 @@ int main(int argc, char** argv)
     camera.cy = 253.5;
     camera.fx = 518.0;
     camera.fy = 519.0;
-    CompuFeaAndDesp(FRAME& frame1);
-    CompuFeaAndDesp(FRAME& frame2);
+    CompuFeaAndDesp(frame1);
+    CompuFeaAndDesp(frame2);
 
-    result = RESULT_OF_PNP MatchAndRansac(FRAME& frame1, FRAME& frame2, CAMERA_INTRINSIC_PARAMETERS& Camera);
+    result = MatchAndRansac(frame1, frame2, camera);
 
     std::cout<<"inlPoint: "<<result.inlPoint<<std::endl;
     std::cout<<"R="<<result.rvec<<std::endl;

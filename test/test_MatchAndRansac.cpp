@@ -17,14 +17,14 @@ int main(int argc, char** argv)
     camera.cy = 253.5;
     camera.fx = 518.0;
     camera.fy = 519.0;
-    CompuFeaAndDesp(frame1);
-    CompuFeaAndDesp(frame2);
+    frame1.ComputeFeatAndDesp();
+    frame2.ComputeFeatAndDesp();
 
     result = MatchAndRansac(frame1, frame2, camera);
 
     std::cout<<"inlPoint: "<<result.inlPoint<<std::endl;
-    std::cout<<"R="<<result.rvec<<std::endl;
-    std::cout<<"t="<<result.tvec<<std::endl;
-    
+    std::cout<<"R = "<<result.rvec<<std::endl;
+    std::cout<<"t = "<<result.tvec<<std::endl;
+
     return 0;
 }

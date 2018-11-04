@@ -19,7 +19,7 @@ int main(int argc, char** argv)
     camera.fx = 518.0;
     camera.fy = 519.0;
 
-    PointCloud::Ptr cloud = image2PointCloud(rgb, depth, camera);
+    PointCloud::Ptr cloud = Image2PointCloud(rgb, depth, camera);
     pcl::io::savePCDFile( "../data/pointcloud.pcd", *cloud );
     viewer.showCloud( cloud );
 

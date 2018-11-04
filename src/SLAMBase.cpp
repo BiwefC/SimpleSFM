@@ -1,6 +1,6 @@
 # include "SLAMBase.hpp"
 
-PointCloud::Ptr image2PointCloud( cv::Mat& rgb, cv::Mat& depth, CAMERA_INTRINSIC_PARAMETERS& camera )
+PointCloud::Ptr Image2PointCloud( cv::Mat& rgb, cv::Mat& depth, CAMERA_INTRINSIC_PARAMETERS& camera )
 {
     PointCloud::Ptr cloud ( new PointCloud );
 
@@ -37,7 +37,7 @@ PointCloud::Ptr image2PointCloud( cv::Mat& rgb, cv::Mat& depth, CAMERA_INTRINSIC
     return cloud;
 }
 
-cv::Point3f point2dTo3d( cv::Point3f& point, CAMERA_INTRINSIC_PARAMETERS& camera )
+cv::Point3f Point2dTo3d( cv::Point3f& point, CAMERA_INTRINSIC_PARAMETERS& camera )
 {
     cv::Point3f p; // 3D 点
     p.z = double( point.z ) / camera.scale;
@@ -46,37 +46,32 @@ cv::Point3f point2dTo3d( cv::Point3f& point, CAMERA_INTRINSIC_PARAMETERS& camera
     return p;
 }
 
-void CompuFeaAndDesp(FRAME& frame)
+void FRAME::ComputeFeatAndDesp(void)
 {
-	cv::Ptr<cv::FeatureDetector> fea_detec;
-	cv::Ptr<cv::DescriptorExtractor> fea_desp;
+    cv::Ptr<cv::FeatureDetector> feat_dectec = cv::ORB::create();
+    cv::Ptr<cv::DescriptorExtractor> feat_desp = cv::ORB::create();
 
-	fea_detec = cv::ORB::create();
-	fea_desp  = cv::ORB::create();
+    feat_dectec->detect(rgb, feat);
+    feat_desp->compute(rgb, feat, desp);
 
-	fea_detec->detect( frame.rgb, frame.fea );
-	fea_desp->compute( frame.rgb, frame.fea, frame.desp );
-
-
-	return;
+    return;
 }
 
-
-RESULT_OF_PNP MatchAndRansac(FRAME& frame1, FRAME& frame2, CAMERA_INTRINSIC_PARAMETERS& Camera)
+RESULT_OF_PNP MatchAndRansac(FRAME& frame1, FRAME& frame2, CAMERA_INTRINSIC_PARAMETERS& camera)
 {
 	//read data from data floder
 	cv::Mat pic1_rgb = frame1.rgb;
 	cv::Mat pic2_rgb = frame2.rgb;
 	cv::Mat pic1_depth = frame1.depth;
 	cv::Mat pic2_depth = frame2.depth;
-  cv::Mat pic1_desp = frame1.desp;
-  cv::Mat pic2_desp = frame2.desp;
+    cv::Mat pic1_desp = frame1.desp;
+    cv::Mat pic2_desp = frame2.desp;
 
-	vector< cv::KeyPoint > fea1 = frame1.fea;
-	vector< cv::KeyPoint > fea2 = frame2.fea;
+	vector< cv::KeyPoint > feat1 = frame1.feat;
+	vector< cv::KeyPoint > feat2 = frame2.feat;
 
 	//output the size of feature point
-	std::cout<<"Key points of two images: "<<fea1.size()<<", "<<fea2.size()<<std::endl;
+	std::cout<<"Key points of two images: "<<feat1.size()<<", "<<feat2.size()<<std::endl;
 
 	//match all feature points
 	vector< cv::DMatch > matches;
@@ -86,7 +81,7 @@ RESULT_OF_PNP MatchAndRansac(FRAME& frame1, FRAME& frame2, CAMERA_INTRINSIC_PARA
 
 	//output match
 	cv::Mat imgMatch;
-	cv::drawMatches( pic1_rgb, fea1, pic2_rgb, fea2, matches, imgMatch);
+	cv::drawMatches( pic1_rgb, feat1, pic2_rgb, feat2, matches, imgMatch);
 	cv::imshow( "matches", imgMatch);
 	cv::imwrite( "./data/matches.png", imgMatch);
 	cv::waitKey(0);
@@ -113,7 +108,7 @@ RESULT_OF_PNP MatchAndRansac(FRAME& frame1, FRAME& frame2, CAMERA_INTRINSIC_PARA
 	//output goodMatch
 	std::cout<<"goodMatch = "<<goodMatch.size()<<std::endl;
 
-	cv::drawMatches( pic1_rgb, fea1, pic2_rgb, fea2, goodMatch, imgMatch);
+	cv::drawMatches( pic1_rgb, feat1, pic2_rgb, feat2, goodMatch, imgMatch);
 	cv::imshow( "good_matches", imgMatch);
 	cv::imwrite( "./data/good_matches.png", imgMatch);
 	cv::waitKey(0);
@@ -127,19 +122,19 @@ RESULT_OF_PNP MatchAndRansac(FRAME& frame1, FRAME& frame2, CAMERA_INTRINSIC_PARA
 	//get the depth of pic1
 	for(size_t i = 0; i < goodMatch.size(); i++)
 	{
-		cv::Point2f p = fea1[goodMatch[i].queryIdx].pt;
+		cv::Point2f p = feat1[goodMatch[i].queryIdx].pt;
 		ushort d = pic1_depth.ptr<ushort>(int(p.y))[int(p.x)];
 		if(d == 0) continue;
-		pic_img.push_back( cv::Point2f(fea2[goodMatch[i].trainIdx].pt));
+		pic_img.push_back( cv::Point2f(feat2[goodMatch[i].trainIdx].pt));
 
 		//(u,v,d) to (x,y,z)
 		cv::Point3f pt (p.x, p.y, d);
-		cv::Point3f pd = point2dTo3d(pt, Camera);
+		cv::Point3f pd = Point2dTo3d(pt, camera);
 		pic_obj.push_back(pd);
 
 	}
 
-	double Camera_matrix[3][3] = {{Camera.fx, 0, Camera.cx},{0, Camera.fy, Camera.cy},{0, 0, 1}};
+	double Camera_matrix[3][3] = {{camera.fx, 0, camera.cx},{0, camera.fy, camera.cy},{0, 0, 1}};
 
 	//build the Camera matrix
 	cv::Mat cameraMatrix(3, 3, CV_64F, Camera_matrix);
@@ -158,12 +153,12 @@ RESULT_OF_PNP MatchAndRansac(FRAME& frame1, FRAME& frame2, CAMERA_INTRINSIC_PARA
     }
 
 	//out inlpoint
-    cv::drawMatches( pic1_rgb, fea1, pic2_rgb, fea2, matchShow, imgMatch);
+    cv::drawMatches( pic1_rgb, feat1, pic2_rgb, feat2, matchShow, imgMatch);
     cv::imshow( "inlPoint matches", imgMatch);
     cv::imwrite( "./data/inlPoint.png", imgMatch);
     cv::waitKey(0);
 
-  RESULT_OF_PNP result;
+    RESULT_OF_PNP result;
 	result.rvec = rvec;
 	result.tvec = tvec;
 	result.inlPoint = inlPoint.rows;

@@ -24,8 +24,8 @@ ADD_EXECUTABLE(test_img2pc test_img2pc.cpp ${SRC})
 TARGET_LINK_LIBRARIES( test_img2pc ${OpenCV_LIBS}
     ${PCL_LIBRARIES} )
 
-ADD_EXECUTABLE(test_CompuFeaAndDesp test_CompuFeaAndDesp.cpp ${SRC})
-TARGET_LINK_LIBRARIES( test_CompuFeaAndDesp ${OpenCV_LIBS}
+ADD_EXECUTABLE(test_ComputeFeatAndDesp test_ComputeFeatAndDesp.cpp ${SRC})
+TARGET_LINK_LIBRARIES( test_ComputeFeatAndDesp ${OpenCV_LIBS}
     ${PCL_LIBRARIES} )
 
 ADD_EXECUTABLE(test_MatchAndRansac test_MatchAndRansac.cpp ${SRC})

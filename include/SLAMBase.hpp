@@ -35,23 +35,26 @@ struct CAMERA_INTRINSIC_PARAMETERS
     double cx, cy, fx, fy, scale;
 };
 
-struct FRAME
-{
-    int frameID; 
-    cv::Mat rgb, depth; 
-    cv::Mat desp;     
-    vector<cv::KeyPoint> fea; //关键点
-};
-
 struct RESULT_OF_PNP
 {
     cv::Mat rvec, tvec;
     int inlPoint;
 };
 
+class FRAME
+{
+public:
+    int frameID;
+    cv::Mat rgb, depth;
+    cv::Mat desp;
+    std::vector<cv::KeyPoint> feat;
 
-PointCloud::Ptr image2PointCloud( cv::Mat& rgb, cv::Mat& depth, CAMERA_INTRINSIC_PARAMETERS& camera );
-void CompuFeaAndDesp(FRAME& frame);
-RESULT_OF_PNP MatchAndRansac(FRAME& frame1, FRAME& frame2, CAMERA_INTRINSIC_PARAMETERS& Camera);
+    void ComputeFeatAndDesp(void);
+};
+
+
+PointCloud::Ptr Image2PointCloud(cv::Mat& rgb, cv::Mat& depth, CAMERA_INTRINSIC_PARAMETERS& camera);
+cv::Point3f Point2dTo3d(cv::Point3f& point, CAMERA_INTRINSIC_PARAMETERS& camera);
+RESULT_OF_PNP MatchAndRansac(FRAME& frame1, FRAME& frame2, CAMERA_INTRINSIC_PARAMETERS& camera);
 
 #endif

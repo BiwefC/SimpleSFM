@@ -7,13 +7,13 @@ int main(int argc, char** argv)
     // while(1);
     FRAME frame;
 
-    frame.rgb = cv::imread("../data/rgb.png");
-    frame.depth = cv::imread("../data/depth.png", -1);
+    frame.rgb = cv::imread("../data/rgb1.png");
+    frame.depth = cv::imread("../data/depth1.png", -1);
 
 
-    CompuFeaAndDesp(frame);
+    frame.ComputeFeatAndDesp();
     cv::Mat imgOutput;
-    cv::drawKeypoints(frame.rgb, frame.fea, imgOutput, cv::Scalar::all(-1), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+    cv::drawKeypoints(frame.rgb, frame.feat, imgOutput, cv::Scalar::all(-1), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
     cv::imshow( "keypoints", imgOutput);
     cv::imwrite( "./data/keypoints.png", imgOutput);
     cv::waitKey(0);

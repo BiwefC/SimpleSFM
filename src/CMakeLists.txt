@@ -10,12 +10,16 @@
 # FIND_PACKAGE( OpenCV REQUIRED )
 
 
-# # set(PCL_INCLUDE_DIRS /usr/local/include/pcl-1.8)
+# # set(PCL_INCLUDE_DIRS /usr/include/pcl-1.8)
 # # 添加头文件和库文件
+# file(GLOB_RECURSE SRC ../src/*.cpp)
+
 # ADD_DEFINITIONS( ${PCL_DEFINITIONS} )
-# INCLUDE_DIRECTORIES( ${PCL_INCLUDE_DIRS}  )
+# INCLUDE_DIRECTORIES( ${PCL_INCLUDE_DIRS} )
+# INCLUDE_DIRECTORIES(../include )
+
 # LINK_LIBRARIES( ${PCL_LIBRARY_DIRS} )
 
-# ADD_EXECUTABLE( generate_pointcloud generatePointCloud.cpp )
-# TARGET_LINK_LIBRARIES( generate_pointcloud ${OpenCV_LIBS}
+# ADD_EXECUTABLE(visualOdometry ${SRC})
+# TARGET_LINK_LIBRARIES( visualOdometry ${OpenCV_LIBS}
 #     ${PCL_LIBRARIES} )

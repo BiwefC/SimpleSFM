@@ -20,7 +20,7 @@ int main(int argc, char** argv)
     result = MatchAndRansac(frame1, frame2, camera);
     std::cout<< result.rvec<< std::endl;
     std::cout<< result.tvec<< std::endl;
-    
+
     T = RvecTvec2Mat(result.rvec, result.tvec);
 
     // std::cout<< T<<std::endl;

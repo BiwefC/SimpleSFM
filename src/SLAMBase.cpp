@@ -102,10 +102,10 @@ Result_of_PnP MatchAndRansac(Frame& frame1, Frame& frame2, Camera_Intrinsic_Para
 
 	//output match
 	cv::Mat imgMatch;
-	cv::drawMatches( pic1_rgb, feat1, pic2_rgb, feat2, matches, imgMatch);
-	cv::imshow( "matches", imgMatch);
-	cv::imwrite( "./data/matches.png", imgMatch);
-	cv::waitKey(0);
+	// cv::drawMatches( pic1_rgb, feat1, pic2_rgb, feat2, matches, imgMatch);
+	// cv::imshow( "matches", imgMatch);
+	// cv::imwrite( "./data/matches.png", imgMatch);
+	// cv::waitKey(0);
 
 	//Selete feature point match
 	//rule:delete points that the distance longer than forth min distance
@@ -119,6 +119,9 @@ Result_of_PnP MatchAndRansac(Frame& frame1, Frame& frame2, Camera_Intrinsic_Para
 	}
 
 	std::cout<<"min_dis = "<<min_dis<<std::endl;
+  if(min_dis <= 10){
+      min_dis = 10;
+  }
 
 	//second:slecte the good feature points
 	for(size_t i = 0; i < matches.size(); i++)
@@ -129,10 +132,10 @@ Result_of_PnP MatchAndRansac(Frame& frame1, Frame& frame2, Camera_Intrinsic_Para
 	//output goodMatch
 	std::cout<<"goodMatch = "<<goodMatch.size()<<std::endl;
 
-	cv::drawMatches( pic1_rgb, feat1, pic2_rgb, feat2, goodMatch, imgMatch);
-	cv::imshow( "good_matches", imgMatch);
-	cv::imwrite( "./data/good_matches.png", imgMatch);
-	cv::waitKey(0);
+	// cv::drawMatches( pic1_rgb, feat1, pic2_rgb, feat2, goodMatch, imgMatch);
+	// cv::imshow( "good_matches", imgMatch);
+	// cv::imwrite( "./data/good_matches.png", imgMatch);
+	// cv::waitKey(0);
 
 	//the next part: use the RANSAC to optimize
 
@@ -174,10 +177,10 @@ Result_of_PnP MatchAndRansac(Frame& frame1, Frame& frame2, Camera_Intrinsic_Para
     }
 
 	//out inlpoint
-    cv::drawMatches( pic1_rgb, feat1, pic2_rgb, feat2, matchShow, imgMatch);
-    cv::imshow( "inlPoint matches", imgMatch);
-    cv::imwrite( "./data/inlPoint.png", imgMatch);
-    cv::waitKey(0);
+    // cv::drawMatches( pic1_rgb, feat1, pic2_rgb, feat2, matchShow, imgMatch);
+    // cv::imshow( "inlPoint matches", imgMatch);
+    // cv::imwrite( "./data/inlPoint.png", imgMatch);
+    // cv::waitKey(0);
 
     Result_of_PnP result;
 	result.rvec = rvec;
@@ -193,15 +196,15 @@ Eigen::Isometry3d RvecTvec2Mat(cv::Mat& rvec, cv::Mat& tvec)
     cv::Rodrigues( rvec, R );
     Eigen::Matrix3d r;
     for ( int i=0; i<3; i++ )
-        for ( int j=0; j<3; j++ ) 
+        for ( int j=0; j<3; j++ )
             r(i,j) = R.at<double>(i,j);
-  
+
     Eigen::Isometry3d T = Eigen::Isometry3d::Identity();
 
     Eigen::AngleAxisd angle(r);
     T = angle;
-    T(0,3) = tvec.at<double>(0,0); 
-    T(1,3) = tvec.at<double>(1,0); 
+    T(0,3) = tvec.at<double>(0,0);
+    T(1,3) = tvec.at<double>(1,0);
     T(2,3) = tvec.at<double>(2,0);
     return T;
 }

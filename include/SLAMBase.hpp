@@ -27,6 +27,7 @@ using namespace std;
 #include <pcl/common/transforms.h>
 #include <pcl/visualization/cloud_viewer.h>
 #include <pcl/filters/voxel_grid.h>
+#include <pcl/filters/passthrough.h>
 
 typedef pcl::PointXYZRGBA PointT;
 typedef pcl::PointCloud<PointT> PointCloud;
@@ -61,5 +62,7 @@ cv::Point3f Point2dTo3d(cv::Point3f& point, Camera_Intrinsic_Parameters& camera)
 Result_of_PnP MatchAndRansac(Frame& frame1, Frame& frame2, Camera_Intrinsic_Parameters& camera);
 Eigen::Isometry3d RvecTvec2Mat(cv::Mat& rvec, cv::Mat& tvec);
 PointCloud::Ptr UpdatePointCloud(PointCloud::Ptr last_pc, Frame& new_frame, Eigen::Isometry3d T, Camera_Intrinsic_Parameters& camera);
+double normofTransform(cv::Mat rvec, cv::Mat tvec);
+
 
 #endif

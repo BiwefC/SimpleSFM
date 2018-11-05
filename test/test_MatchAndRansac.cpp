@@ -3,8 +3,8 @@
 int main(int argc, char** argv)
 {
     // while(1);
-    Frame frame1(1, "../data");
-    Frame frame2(2, "../data");
+    Frame frame1(255, "../../data");
+    Frame frame2(259, "../../data");
     Result_of_PnP result;
 
     Camera_Intrinsic_Parameters camera;

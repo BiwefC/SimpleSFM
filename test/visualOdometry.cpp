@@ -5,8 +5,6 @@ using namespace std;
 
 #include "SLAMBase.hpp"
 
-// 度量运动的大小
-double normofTransform( cv::Mat rvec, cv::Mat tvec );
 
 int main( int argc, char** argv )
 {
@@ -56,7 +54,7 @@ int main( int argc, char** argv )
         //cloud = joinPointCloud( cloud, currFrame, T.inverse(), camera );
         cloud = UpdatePointCloud( cloud, currFrame, T, camera );
 
-        if ( visualize == true )
+        if ( visualize && (currIndex % 10 == 0) )
             viewer.showCloud( cloud );
 
         lastFrame = currFrame;
@@ -64,9 +62,4 @@ int main( int argc, char** argv )
 
     // pcl::io::savePCDFile( "data/result.pcd", *cloud );
     return 0;
-}
-
-double normofTransform( cv::Mat rvec, cv::Mat tvec )
-{
-    return fabs(min(cv::norm(rvec), 2*M_PI-cv::norm(rvec)))+ fabs(cv::norm(tvec));
 }

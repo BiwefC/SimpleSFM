@@ -65,6 +65,7 @@ Frame::Frame(int index, string data_dir)
 
     rgb = cv::imread(rgb_path);
     depth = cv::imread(depth_path, -1);
+    frameID = index;
 }
 
 void Frame::ComputeFeatAndDesp(void)
@@ -119,8 +120,8 @@ Result_of_PnP MatchAndRansac(Frame& frame1, Frame& frame2, Camera_Intrinsic_Para
 	}
 
 	std::cout<<"min_dis = "<<min_dis<<std::endl;
-  if(min_dis <= 10){
-      min_dis = 10;
+  if(min_dis <= 20){
+      min_dis = 20;
   }
 
 	//second:slecte the good feature points
@@ -226,4 +227,10 @@ PointCloud::Ptr UpdatePointCloud(PointCloud::Ptr last_pc, Frame& new_frame, Eige
 	PointCloud::Ptr tmp(new PointCloud());
 	return newCloud;
 
+}
+
+
+double normofTransform( cv::Mat rvec, cv::Mat tvec )
+{
+    return fabs(min(cv::norm(rvec), 2*M_PI-cv::norm(rvec)))+ fabs(cv::norm(tvec));
 }

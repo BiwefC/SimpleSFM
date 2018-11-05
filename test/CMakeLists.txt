@@ -2,8 +2,21 @@ cmake_minimum_required(VERSION 2.8)
 # 增加一个可执行的二进制
 # ADD_EXECUTABLE( main main.cpp )
 
+#add c++11
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11") 
 # 增加PCL库的依赖
 FIND_PACKAGE( PCL REQUIRED )
+
+# add dependence of g2o
+LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules )
+SET( G2O_ROOT /usr/local/include/g2o )
+FIND_PACKAGE( G2O )
+set(G2O_LIBRARIES g2o_core g2o_types_slam3d g2o_solver_csparse g2o_stuff g2o_csparse_extension)
+# CSparse_g2o
+FIND_PACKAGE( CSparse )
+INCLUDE_DIRECTORIES( ${G2O_INCLUDE_DIR} ${CSPARSE_INCLUDE_DIR} )
+
+
 
 # list(REMOVE_ITEM PCL_LIBRARIES "vtkproj4") # use this in Ubuntu 16.04
 # 增加opencv的依赖
@@ -43,3 +56,7 @@ TARGET_LINK_LIBRARIES( test_UpdatePointCloud ${OpenCV_LIBS}
 ADD_EXECUTABLE(visualOdometry visualOdometry.cpp ${SRC})
 TARGET_LINK_LIBRARIES( visualOdometry ${OpenCV_LIBS}
     ${PCL_LIBRARIES} )
+
+ADD_EXECUTABLE(g2o g2o.cpp ${SRC})
+TARGET_LINK_LIBRARIES( g2o ${OpenCV_LIBS}
+    ${PCL_LIBRARIES} ${G2O_LIBRARIES} ${CSPARSE_LIBRARY})

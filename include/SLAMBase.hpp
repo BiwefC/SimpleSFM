@@ -7,6 +7,7 @@
 #include <fstream>
 #include <vector>
 #include <map>
+#include <memory>
 using namespace std;
 
 // Eigen
@@ -29,6 +30,11 @@ using namespace std;
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/filters/passthrough.h>
 
+
+#include "DBoW2/FORB.h"
+#include "DBoW2/TemplatedVocabulary.h"
+
+
 typedef pcl::PointXYZRGBA PointT;
 typedef pcl::PointCloud<PointT> PointCloud;
 
@@ -46,20 +52,24 @@ struct Result_of_PnP
 class Frame
 {
 public:
+    typedef shared_ptr<Frame> Ptr;
     Frame(void);
     Frame(int index, string data_dir);
     int frameID;
     cv::Mat rgb, depth;
     cv::Mat desp;
     std::vector<cv::KeyPoint> feat;
+    DBoW2::BowVector bowVec;
 
     void ComputeFeatAndDesp(void);
+    vector<cv::Mat> DescriptorVector(void);
 };
 
 
 PointCloud::Ptr Image2PointCloud(cv::Mat& rgb, cv::Mat& depth, Camera_Intrinsic_Parameters& camera);
 cv::Point3f Point2dTo3d(cv::Point3f& point, Camera_Intrinsic_Parameters& camera);
 Result_of_PnP MatchAndRansac(Frame& frame1, Frame& frame2, Camera_Intrinsic_Parameters& camera);
+Result_of_PnP MatchAndRansac(Frame::Ptr& frame1, Frame::Ptr& frame2, Camera_Intrinsic_Parameters& camera);
 Eigen::Isometry3d RvecTvec2Mat(cv::Mat& rvec, cv::Mat& tvec);
 PointCloud::Ptr UpdatePointCloud(PointCloud::Ptr last_pc, Frame& new_frame, Eigen::Isometry3d T, Camera_Intrinsic_Parameters& camera);
 double normofTransform(cv::Mat rvec, cv::Mat tvec);

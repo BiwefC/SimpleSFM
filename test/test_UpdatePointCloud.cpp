@@ -4,8 +4,8 @@ int main(int argc, char** argv)
 {
 	Result_of_PnP result;
 	Eigen::Isometry3d T;
-    Frame frame1(1, "../data");
-    Frame frame2(2, "../data");
+    Frame frame1(247, "../../data");
+    Frame frame2(255, "../../data");
 
 	Camera_Intrinsic_Parameters camera;
 	camera.scale = 1000;

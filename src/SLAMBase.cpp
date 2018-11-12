@@ -79,6 +79,16 @@ void Frame::ComputeFeatAndDesp(void)
     return;
 }
 
+vector<cv::Mat> Frame::DescriptorVector(void)
+{
+    vector<cv::Mat> desps;
+    for(size_t i = 0; i < feat.size(); i++)
+    {
+        desp.push_back(desp.row(i).clone());
+    }
+    return desps;
+}
+
 Result_of_PnP MatchAndRansac(Frame& frame1, Frame& frame2, Camera_Intrinsic_Parameters& camera)
 {
 	//read data from data floder
@@ -188,6 +198,117 @@ Result_of_PnP MatchAndRansac(Frame& frame1, Frame& frame2, Camera_Intrinsic_Para
 	result.tvec = tvec;
 	result.inlPoint = inlPoint.rows;
 	return result;
+}
+
+Result_of_PnP MatchAndRansac(Frame::Ptr& frame1, Frame::Ptr& frame2, Camera_Intrinsic_Parameters& camera)
+{
+    //read data from data floder
+    cv::Mat pic1_rgb = frame1->rgb;
+    cv::Mat pic2_rgb = frame2->rgb;
+    cv::Mat pic1_depth = frame1->depth;
+    cv::Mat pic2_depth = frame2->depth;
+    cv::Mat pic1_desp = frame1->desp;
+    cv::Mat pic2_desp = frame2->desp;
+
+    vector< cv::KeyPoint > feat1 = frame1->feat;
+    vector< cv::KeyPoint > feat2 = frame2->feat;
+
+    //output the size of feature point
+    std::cout<<"Key points of two images: "<<feat1.size()<<", "<<feat2.size()<<std::endl;
+
+    //match all feature points
+    vector< cv::DMatch > matches;
+    cv::BFMatcher matcher;
+    matcher.match(pic1_desp, pic2_desp, matches);
+    std::cout<<"Find total "<<matches.size()<<" matches."<<std::endl;
+
+    //output match
+    cv::Mat imgMatch;
+    // cv::drawMatches( pic1_rgb, feat1, pic2_rgb, feat2, matches, imgMatch);
+    // cv::imshow( "matches", imgMatch);
+    // cv::imwrite( "./data/matches.png", imgMatch);
+    // cv::waitKey(0);
+
+    //Selete feature point match
+    //rule:delete points that the distance longer than forth min distance
+    // first step : find the min distance
+  vector< cv::DMatch > goodMatch;
+  double min_dis = 10000000;
+
+    for(size_t i = 0; i < matches.size(); i++)
+    {
+        if(matches[i].distance < min_dis) min_dis = matches[i].distance;
+    }
+
+    std::cout<<"min_dis = "<<min_dis<<std::endl;
+  if(min_dis <= 20){
+      min_dis = 20;
+  }
+
+    //second:slecte the good feature points
+    for(size_t i = 0; i < matches.size(); i++)
+    {
+        if (matches[i].distance < 10*min_dis) goodMatch.push_back(matches[i]);
+    }
+
+    //output goodMatch
+    std::cout<<"goodMatch = "<<goodMatch.size()<<std::endl;
+
+    // cv::drawMatches( pic1_rgb, feat1, pic2_rgb, feat2, goodMatch, imgMatch);
+    // cv::imshow( "good_matches", imgMatch);
+    // cv::imwrite( "./data/good_matches.png", imgMatch);
+    // cv::waitKey(0);
+
+    //the next part: use the RANSAC to optimize
+
+    //inital
+    vector<cv::Point3f> pic_obj;
+    vector<cv::Point2f> pic_img;
+
+    //get the depth of pic1
+    for(size_t i = 0; i < goodMatch.size(); i++)
+    {
+        cv::Point2f p = feat1[goodMatch[i].queryIdx].pt;
+        ushort d = pic1_depth.ptr<ushort>(int(p.y))[int(p.x)];
+        if(d == 0) continue;
+        pic_img.push_back( cv::Point2f(feat2[goodMatch[i].trainIdx].pt));
+
+        //(u,v,d) to (x,y,z)
+        cv::Point3f pt (p.x, p.y, d);
+        cv::Point3f pd = Point2dTo3d(pt, camera);
+        pic_obj.push_back(pd);
+
+    }
+
+    double Camera_matrix[3][3] = {{camera.fx, 0, camera.cx},{0, camera.fy, camera.cy},{0, 0, 1}};
+
+    //build the Camera matrix
+    cv::Mat cameraMatrix(3, 3, CV_64F, Camera_matrix);
+    cv::Mat rvec, tvec, inlPoint;
+
+    cv::solvePnPRansac(pic_obj, pic_img, cameraMatrix, cv::Mat(), rvec, tvec, false, 100, 8, 0.99, inlPoint);
+
+    std::cout<<"inlPoint: "<<inlPoint.rows<<std::endl;
+    std::cout<<"R="<<rvec<<std::endl;
+    std::cout<<"t="<<tvec<<std::endl;
+
+    vector<cv::DMatch> matchShow;
+    for (size_t i = 0; i < inlPoint.rows; i++)
+    {
+        matchShow.push_back(goodMatch[inlPoint.ptr<int>(i)[0]]);
+    }
+
+    //out inlpoint
+    // cv::drawMatches( pic1_rgb, feat1, pic2_rgb, feat2, matchShow, imgMatch);
+    // cv::imshow( "inlPoint matches", imgMatch);
+    // cv::imwrite( "./data/inlPoint.png", imgMatch);
+    // cv::waitKey(0);
+
+    Result_of_PnP result;
+    result.rvec = rvec;
+    result.tvec = tvec;
+    result.inlPoint = inlPoint.rows;
+    return result;
 }
 
 

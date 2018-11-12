@@ -10,9 +10,10 @@ using namespace std;
 enum CHECK_RESULT {NOT_MATCHED=0, TOO_FAR_AWAY, TOO_CLOSE, KEYFRAME};
 
 CHECK_RESULT CompareWithKeyFrame(Frame::Ptr& frame1, Frame::Ptr& frame2, g2o::SparseOptimizer& opti, Camera_Intrinsic_Parameters camera, bool is_loops = false);
-void checkRandomLoops( vector<Frame::Ptr>& frames, Frame::Ptr& currFrame, g2o::SparseOptimizer& opti, Camera_Intrinsic_Parameters camera);
+void checkBoWLoops( vector<Frame::Ptr>& frames, Frame::Ptr& currFrame, g2o::SparseOptimizer& opti, Camera_Intrinsic_Parameters camera);
 void checkNearbyLoops( vector<Frame::Ptr>& frames, Frame::Ptr& currFrame, g2o::SparseOptimizer& opti, Camera_Intrinsic_Parameters camera);
 Graph graph;
+Loop loop_inst;
 
 int main( int argc, char** argv )
 {
@@ -78,10 +79,12 @@ int main( int argc, char** argv )
                  * (very important so I've said three times!)
                  */
                 // 检测回环
+                loop_inst.add(currFrame);
                 if (check_loop_closure)
                 {
+                    vector<Frame::Ptr> frames_tmp = loop_inst.getPossibleLoops(currFrame);
                     checkNearbyLoops(graph.keyframes, currFrame, graph.optimizer, camera);
-                    checkRandomLoops(graph.keyframes, currFrame, graph.optimizer, camera);
+                    checkBoWLoops(frames_tmp, currFrame, graph.optimizer, camera);
                 }
                 // keyframes.push_back(currFrame);
                 break;
@@ -215,27 +218,14 @@ void checkNearbyLoops( vector<Frame::Ptr>& frames, Frame::Ptr& currFrame, g2o::S
     }
 }
 
-void checkRandomLoops( vector<Frame::Ptr>& frames, Frame::Ptr& currFrame, g2o::SparseOptimizer& opti, Camera_Intrinsic_Parameters camera)
+void checkBoWLoops( vector<Frame::Ptr>& frames, Frame::Ptr& currFrame, g2o::SparseOptimizer& opti, Camera_Intrinsic_Parameters camera)
 {
     static int random_loops = 5;
-    srand( (unsigned int) time(NULL) );
     // 随机取一些帧进行检测
 
-    if ( frames.size() <= random_loops )
+    // no enough keyframes, check everyone
+    for (size_t i=0; i<frames.size(); i++)
     {
-        // no enough keyframes, check everyone
-        for (size_t i=0; i<frames.size(); i++)
-        {
-            CompareWithKeyFrame( frames[i], currFrame, opti, camera, true);
-        }
-    }
-    else
-    {
-        // randomly check loops
-        for (int i=0; i<random_loops; i++)
-        {
-            int index = rand()%frames.size();
-            CompareWithKeyFrame( frames[index], currFrame, opti, camera, true);
-        }
+        CompareWithKeyFrame( frames[i], currFrame, opti, camera, true);
     }
 }

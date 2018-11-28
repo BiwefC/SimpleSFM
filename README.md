@@ -9,3 +9,5 @@ Our system environment is :
 * PCL 1.8.1
 * G2O
 * DBoW2
+
+chw nb
